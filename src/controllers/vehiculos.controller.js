@@ -1,6 +1,5 @@
 import { pool } from "../config/db.js";
 
-// Obtener todos los vehículos
 export const getVehiculos = async (req, res) => {
   try {
     const [rows] = await pool.query(`SELECT * FROM vehiculos WHERE IdStatus = 1`);
@@ -10,7 +9,6 @@ export const getVehiculos = async (req, res) => {
   }
 };
 
-// Obtener un vehículo por id
 export const getVehiculoById = async (req, res) => {
   try {
     const [rows] = await pool.query(`SELECT * FROM vehiculos WHERE idVehiculo = ?`, [req.params.id]);
@@ -21,24 +19,22 @@ export const getVehiculoById = async (req, res) => {
   }
 };
 
-// Crear un nuevo vehículo
 export const createVehiculo = async (req, res) => {
   try {
-    const { placa, modelo } = req.body;
-    const [result] = await pool.query(`INSERT INTO vehiculos (placa, modelo) VALUES (?, ?)`, [placa, modelo]);
-    res.status(201).json({ idVehiculo: result.insertId, placa, modelo });
+    const { placa, modelo, marca } = req.body;
+    const [result] = await pool.query(`INSERT INTO vehiculos (placa, modelo, marca) VALUES (?, ?, ?)`, [placa, modelo, marca]);
+    res.status(201).json({ idVehiculo: result.insertId, placa, modelo, marca });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Actualizar un vehículo
 export const updateVehiculo = async (req, res) => {
   try {
-    const { placa, modelo } = req.body;
-    const [result] = await pool.query(`UPDATE vehiculos SET placa = ?, modelo = ? WHERE idVehiculo = ?`, [placa, modelo, req.params.id]);
+    const { placa, modelo, marca } = req.body;
+    const [result] = await pool.query(`UPDATE vehiculos SET placa = ?, modelo = ?, marca=? WHERE idVehiculo = ?`, [placa, modelo, marca, req.params.id,]);
     if (result.affectedRows === 0) return res.status(404).json({ message: "Vehículo no encontrado" });
-    res.json({ idVehiculo: req.params.id, placa, modelo });
+    res.json({ idVehiculo: req.params.id, placa, modelo, marca });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

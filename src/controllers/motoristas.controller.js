@@ -9,7 +9,6 @@ export const getMotoristas = async (req, res) => {
   }
 };
 
-// Obtener un motorista por id
 export const getMotoristaById = async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -24,33 +23,31 @@ export const getMotoristaById = async (req, res) => {
   }
 };
 
-// Crear un nuevo motorista
 export const createMotorista = async (req, res) => {
   try {
-    const { nombre, IdStatus } = req.body;
+    const { nombre, IdStatus, apellido, numeroLicencia } = req.body;
     const [result] = await pool.query(
-      `INSERT INTO motoristas (nombre, IdStatus) VALUES (?, ?)`,
-      [nombre, IdStatus || 1] // 1 = Activo por defecto
+      `INSERT INTO motoristas (nombre, IdStatus, apellido, numeroLicencia) VALUES (?, ?, ?, ?)`,
+      [nombre, IdStatus || 1, apellido, numeroLicencia] 
     );
     res
       .status(201)
-      .json({ idMotorista: result.insertId, nombre, IdStatus: IdStatus || 1 });
+      .json({ idMotorista: result.insertId, nombre, IdStatus: IdStatus || 1, apellido, numeroLicencia });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Actualizar un motorista
 export const updateMotorista = async (req, res) => {
   try {
-    const { nombre, IdStatus } = req.body;
+    const { nombre, apellido, numeroLicencia } = req.body;
     const [result] = await pool.query(
-      `UPDATE motoristas SET nombre = ?, IdStatus = ? WHERE idMotorista = ?`,
-      [nombre, IdStatus, req.params.id]
+      `UPDATE motoristas SET nombre = ?, IdStatus = ?, apellido = ?, numeroLicencia = ? WHERE idMotorista = ?`,
+      [nombre, 1, apellido, numeroLicencia, req.params.id]
     );
     if (result.affectedRows === 0)
       return res.status(404).json({ message: "Motorista no encontrado" });
-    res.json({ idMotorista: req.params.id, nombre, IdStatus });
+    res.json({ idMotorista: req.params.id, nombre, apellido, numeroLicencia });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
