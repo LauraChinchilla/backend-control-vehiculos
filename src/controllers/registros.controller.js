@@ -3,11 +3,18 @@ import { pool } from "../config/db.js";
 export const getRegistros = async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT r.idRegistro, r.tipo, r.fecha,v.placa,m.nombre
+      SELECT 
+        r.idRegistro, 
+        r.tipo, 
+        r.fecha,
+        r.hora,
+        v.placa,
+        m.nombre
       FROM registros r
         JOIN vehiculos v ON r.vehiculo_id = v.idVehiculo
         JOIN motoristas m ON r.motorista_id = m.idMotorista
-      WHERE r.IdStatus=1`);
+      WHERE r.IdStatus = 1
+    `);
 
     res.json(rows);
   } catch (error) {
@@ -16,13 +23,32 @@ export const getRegistros = async (req, res) => {
 };
 
 export const createRegistro = async (req, res) => {
-  const { vehiculo_id, motorista_id, tipo, fecha, kilometrajeInicial, kilometrajeFinal, kilometraje} = req.body;
+  const { 
+    vehiculo_id, 
+    motorista_id, 
+    tipo, 
+    fecha, 
+    hora, 
+    kilometrajeInicial, 
+    kilometrajeFinal, 
+    kilometraje
+  } = req.body;
 
   try {
     await pool.query(
-      `INSERT INTO registros (vehiculo_id, motorista_id, tipo, fecha, kilometrajeInicial, kilometrajeFinal, kilometraje)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [vehiculo_id, motorista_id, tipo, fecha, kilometrajeInicial, kilometrajeFinal, kilometraje]
+      `INSERT INTO registros 
+      (vehiculo_id, motorista_id, tipo, fecha, hora, kilometrajeInicial, kilometrajeFinal, kilometraje)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        vehiculo_id, 
+        motorista_id, 
+        tipo, 
+        fecha, 
+        hora, 
+        kilometrajeInicial, 
+        kilometrajeFinal, 
+        kilometraje
+      ]
     );
 
     res.status(201).json({ message: "Registro creado correctamente" });
@@ -33,13 +59,14 @@ export const createRegistro = async (req, res) => {
 
 export const getVtaRegistros = async (req, res) => {
   try {
-    const [rows] = await pool.query(`SELECT * FROM vw_RegistrosDetalle WHERE IdStatus = 1`);
+    const [rows] = await pool.query(
+      `SELECT * FROM vw_RegistrosDetalle WHERE IdStatus = 1`
+    );
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 export const changeStatus = async (req, res) => {
   try {
@@ -57,9 +84,17 @@ export const changeStatus = async (req, res) => {
   }
 };
 
-
 export const updateRegistro = async (req, res) => {
-  let { vehiculo_id, motorista_id, tipo, fecha, kilometrajeInicial, kilometrajeFinal, kilometraje } = req.body;
+  let { 
+    vehiculo_id, 
+    motorista_id, 
+    tipo, 
+    fecha, 
+    hora, 
+    kilometrajeInicial, 
+    kilometrajeFinal, 
+    kilometraje 
+  } = req.body;
 
   try {
     const formatDateForMySQL = (d) => {
@@ -77,9 +112,26 @@ export const updateRegistro = async (req, res) => {
 
     await pool.query(
       `UPDATE registros
-       SET vehiculo_id = ?, motorista_id = ?, tipo = ?, fecha = ?, kilometrajeInicial = ?, kilometrajeFinal = ?, kilometraje = ?
+       SET vehiculo_id = ?, 
+           motorista_id = ?, 
+           tipo = ?, 
+           fecha = ?, 
+           hora = ?, 
+           kilometrajeInicial = ?, 
+           kilometrajeFinal = ?, 
+           kilometraje = ?
        WHERE idRegistro = ?`,
-      [vehiculo_id, motorista_id, tipo, fechaMySQL, kilometrajeInicial, kilometrajeFinal, kilometraje, req.params.id]
+      [
+        vehiculo_id,
+        motorista_id,
+        tipo,
+        fechaMySQL,
+        hora,
+        kilometrajeInicial,
+        kilometrajeFinal,
+        kilometraje,
+        req.params.id
+      ]
     );
 
     res.status(200).json({ message: "Registro actualizado correctamente" });
@@ -98,7 +150,13 @@ export const getRegistrosHoy = async (req, res) => {
     const fechaHoy = `${yyyy}-${mm}-${dd}`;
 
     const [rows] = await pool.query(`
-      SELECT r.idRegistro, r.tipo, r.fecha, v.placa, m.nombre
+      SELECT 
+        r.idRegistro, 
+        r.tipo, 
+        r.fecha, 
+        r.hora,
+        v.placa, 
+        m.nombre
       FROM registros r
       JOIN vehiculos v ON r.vehiculo_id = v.idVehiculo
       JOIN motoristas m ON r.motorista_id = m.idMotorista
