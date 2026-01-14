@@ -2,7 +2,7 @@ import { pool } from "../config/db.js";
 
 export const getVehiculos = async (req, res) => {
   try {
-    const [rows] = await pool.query(`SELECT * FROM vehiculos WHERE IdStatus = 1`);
+    const [rows] = await pool.query(`SELECT * FROM vta_vehiculos WHERE IdStatus = 1`);
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -41,7 +41,6 @@ export const updateVehiculo = async (req, res) => {
 };
 
 
-// Cambiar estado a Eliminado
 export const changeStatus = async (req, res) => {
   try {
     const [result] = await pool.query(
