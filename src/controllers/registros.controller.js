@@ -15,7 +15,6 @@ export const getRegistros = async (req, res) => {
         JOIN motoristas m ON r.motorista_id = m.idMotorista
       WHERE r.IdStatus = 1
     `);
-
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
